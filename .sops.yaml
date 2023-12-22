@@ -1,0 +1,9 @@
+keys:
+  - &admin_yodal 4ed6f06945bd7b77eeb59a3101a634f1589b114b
+  - &server_oarre 5e8cce0ec807e494b2d2bcf9016c4ccc477a5a09
+creation_rules:
+  - path_regex: \.(yaml|json|env|ini)
+    key_groups:
+    - pgp:
+      - *admin_yodal
+      - *server_oarre
