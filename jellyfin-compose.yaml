@@ -6,7 +6,6 @@ services:
       - PUID=1000
       - PGID=100
       - TZ=America/New_York
-      # - JELLYFIN_PublishedServerUrl=192.168.0.5
     devices:
       - /dev/dri:/dev/dri
     volumes:
@@ -18,4 +17,9 @@ services:
       - 8920:8920 # HTTPS web UI
       - 7359:7359/udp # Jellyfin client discovery
       - 1900:1900/udp # DLNA service discovery
+    networks:
+      - swag_default
     restart: unless-stopped
+networks:
+  swag_default:
+    external: true

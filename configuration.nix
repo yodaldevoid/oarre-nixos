@@ -134,8 +134,28 @@
     };
   };
 
+  systemd.services."docker-compose@ddclient" = {
+    overrideStrategy = "asDropin";
+    wantedBy = [ "default.target" ];
+  };
+  environment.etc.ddclient = {
+    source = ./ddclient-compose.yaml;
+    target = "docker/compose/ddclient/compose.yaml";
+  };
+
+  systemd.services."docker-compose@swag" = {
+    overrideStrategy = "asDropin";
+    wantedBy = [ "default.target" ];
+  };
+  environment.etc.swag = {
+    source = ./swag-compose.yaml;
+    target = "docker/compose/swag/compose.yaml";
+  };
+
   systemd.services."docker-compose@mealie" = {
     overrideStrategy = "asDropin";
+    requires = [ "docker-compose@swag.service" ];
+    after = [ "docker-compose@swag.service" ];
     wantedBy = [ "default.target" ];
   };
   environment.etc.mealie-compose = {
@@ -145,6 +165,8 @@
 
   systemd.services."docker-compose@jellyfin" = {
     overrideStrategy = "asDropin";
+    requires = [ "docker-compose@swag.service" ];
+    after = [ "docker-compose@swag.service" ];
     wantedBy = [ "default.target" ];
   };
   environment.etc.jellyfin-compose = {

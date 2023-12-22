@@ -1,0 +1,21 @@
+services:
+  swag:
+    image: ghcr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+      - URL=thevoidbetween.us
+      - SUBDOMAINS=wildcard
+      - VALIDATION=dns
+      - DNSPLUGIN=cloudflare
+      - EMAIL=ga29smith@gmail.com
+    volumes:
+      - /var/lib/swag:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
