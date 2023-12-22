@@ -107,6 +107,15 @@
     target = "docker/compose/mealie/compose.yaml";
   };
 
+  systemd.services."docker-compose@swag" = {
+    overrideStrategy = "asDropin";
+    wantedBy = [ "default.target" ];
+  };
+  environment.etc.swag = {
+    source = ./swag-compose.yaml;
+    target = "docker/compose/swag/compose.yaml";
+  };
+
   # TODO: get systemd-boot working with ZFS
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/efi";

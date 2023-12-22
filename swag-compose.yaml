@@ -1,0 +1,21 @@
+services:
+  swag:
+    image: ghcr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+      - URL=<mydomain.duckdns>
+      - SUBDOMAINS=wildcard
+      - VALIDATION=dns
+      - DNSPLUGIN=duckdns
+      - EMAIL=ga29smith+letsencrypt@gmail.com
+    volumes:
+      - /etc/config/swag:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
