@@ -143,6 +143,16 @@
     target = "docker/compose/mealie/compose.yaml";
   };
 
+  systemd.services."docker-compose@jellyfin" = {
+    overrideStrategy = "asDropin";
+    wantedBy = [ "default.target" ];
+  };
+  environment.etc.jellyfin-compose = {
+    source = ./jellyfin-compose.yaml;
+    target = "docker/compose/jellyfin/compose.yaml";
+  };
+  # TODO: automatically create links from config to log and cache
+
   # TODO: get systemd-boot working with ZFS
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/efi";

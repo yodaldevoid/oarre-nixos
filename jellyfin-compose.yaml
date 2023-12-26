@@ -1,0 +1,21 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+      # - JELLYFIN_PublishedServerUrl=192.168.0.5
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /var/lib/jellyfin:/config
+      - /data/tvshows:/data/tvshows
+      - /data/movies:/data/movies
+    ports:
+      - 8096:8096 # HTTP web UI
+      - 8920:8920 # HTTPS web UI
+      - 7359:7359/udp # Jellyfin client discovery
+      - 1900:1900/udp # DLNA service discovery
+    restart: unless-stopped
