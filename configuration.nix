@@ -17,13 +17,18 @@
   ];
   environment.enableAllTerminfo = true;
 
+  users.groups.samba = {};
   users.users.yodal = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "docker" "podman" ];
+    extraGroups = [ "wheel" "networkmanager" "docker" "podman" "samba" ];
     packages = with pkgs; [
       tree
     ];
     openssh.authorizedKeys.keyFiles = [ ./monamo_ed25519.pub ./katrin_ed25519.pub ];
+  };
+  users.users.samba = {
+    isNormalUser = true;
+    group = "samba";
   };
 
   sops.defaultSopsFile = ./secrets.yaml;
@@ -63,6 +68,37 @@
     settings.PasswordAuthentication = false;
   };
   services.tailscale.enable = true;
+
+  services.samba-wsdd = {
+    enable = true;
+    openFirewall = true;
+  };
+  services.samba = {
+    enable = true;
+    securityType = "user";
+    openFirewall = true;
+    extraConfig = ''
+      server string = %h
+      guest ok = yes
+      map to guest = Bad User
+      log file = /var/log/samba/%m.log
+      max log size = 50
+      printcap name = /dev/null
+      load printers = no
+    '';
+    shares = {
+      media = {
+        path = "/data";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "yes";
+        "create mask" = "0664";
+        "directory mask" = "0775";
+        "force user" = "samba";
+        "force group" = "samba";
+      };
+    };
+  };
 
   virtualisation.docker = {
     enable = true;
