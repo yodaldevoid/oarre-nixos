@@ -10,10 +10,10 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
-    pkgs.sops
-    pkgs.tailscale
-    pkgs.docker-client
-    pkgs.docker-compose
+    sops
+    tailscale
+    docker-client
+    docker-compose
   ];
   environment.enableAllTerminfo = true;
 
