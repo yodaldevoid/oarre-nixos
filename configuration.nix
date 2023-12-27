@@ -36,7 +36,7 @@
 
   networking.hostName = "oarre";
   networking.hostId = "441b4f6d";
-  networking.wireless.enable = true;
+  networking.wireless.enable = false;
   networking.wireless.environmentFile = config.sops.secrets."wireless.env".path;
   networking.wireless.networks = {
     "@HOME_SSID@" = {
