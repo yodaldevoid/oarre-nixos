@@ -66,6 +66,7 @@
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
+    settings.X11Forwarding = true;
   };
   services.tailscale.enable = true;
 
