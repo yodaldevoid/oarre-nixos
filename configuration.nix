@@ -5,6 +5,7 @@
   in [
     ./hardware-configuration.nix
     "${builtins.fetchTarball "https://github.com/Mic92/sops-nix/archive/${sops-nix_commit}.tar.gz"}/modules/sops"
+    ./compose.nix
   ];
 
   environment.systemPackages = with pkgs; [
@@ -119,62 +120,24 @@
     };
   };
 
-  # TODO: move docker-compose stuff to a module
-  systemd.services."docker-compose@" = {
-    description = "%i service with docker compose";
-    partOf = [ "docker.service" ];
-    after = [ "docker.service" "docker.socket" ];
-    # partOf = [ "podman.service" ];
-    # after = [ "podman.service" "podman.socket" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      WorkingDirectory = "/etc/docker/compose/%i";
-      ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
-      ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+  compose.enable = true;
+  compose.applications = {
+    ddclient.composeFile = ./ddclient-compose.yaml;
+    swag.composeFile = ./swag-compose.yaml;
+    mealie = {
+      composeFile = ./mealie-compose.yaml;
+      # TODO: provide less "magic" way to define these
+      requires = [ "compose-application@swag.service" ];
+      after = [ "compose-application@swag.service" ];
+    };
+    jellyfin = {
+      composeFile = ./jellyfin-compose.yaml;
+      # TODO: provide less "magic" way to define these
+      requires = [ "compose-application@swag.service" ];
+      after = [ "compose-application@swag.service" ];
     };
   };
-
-  systemd.services."docker-compose@ddclient" = {
-    overrideStrategy = "asDropin";
-    wantedBy = [ "default.target" ];
-  };
-  environment.etc.ddclient = {
-    source = ./ddclient-compose.yaml;
-    target = "docker/compose/ddclient/compose.yaml";
-  };
-
-  systemd.services."docker-compose@swag" = {
-    overrideStrategy = "asDropin";
-    wantedBy = [ "default.target" ];
-  };
-  environment.etc.swag = {
-    source = ./swag-compose.yaml;
-    target = "docker/compose/swag/compose.yaml";
-  };
-
-  systemd.services."docker-compose@mealie" = {
-    overrideStrategy = "asDropin";
-    requires = [ "docker-compose@swag.service" ];
-    after = [ "docker-compose@swag.service" ];
-    wantedBy = [ "default.target" ];
-  };
-  environment.etc.mealie-compose = {
-    source = ./mealie-compose.yaml;
-    target = "docker/compose/mealie/compose.yaml";
-  };
-
-  systemd.services."docker-compose@jellyfin" = {
-    overrideStrategy = "asDropin";
-    requires = [ "docker-compose@swag.service" ];
-    after = [ "docker-compose@swag.service" ];
-    wantedBy = [ "default.target" ];
-  };
-  environment.etc.jellyfin-compose = {
-    source = ./jellyfin-compose.yaml;
-    target = "docker/compose/jellyfin/compose.yaml";
-  };
-  # TODO: automatically create links from config to log and cache
+  # TODO: automatically create links from config to log and cache for jellyfin
 
   # TODO: get systemd-boot working with ZFS
   boot.loader.efi.canTouchEfiVariables = true;
