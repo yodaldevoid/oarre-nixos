@@ -47,57 +47,28 @@ in {
   in (mkIf cfg.enable {
     environment.systemPackages = [ pkgs.docker-compose ];
   
-    systemd.services = let
-      serviceTemplates = {
-        "compose-application@" = {
-          description = "%i application from a compose file";
-          partOf = [ runtimeService ];
-          after = [ runtimeService runtimeSocket ];
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            WorkingDirectory = "/etc/compose/%i";
-            ExecStart = composeExecutable + " up -d";
-            ExecStop = composeExecutable + " down";
-          };
-        };
-        "compose-watcher@" = {
-          description = "Restart compose-application@%i service when compose file changes";
-          requisite = [ "compose@%i.service" ];
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.systemdMinimal}/bin/systemctl try-restart compose-application@%i.service";
-          };
+    systemd.services = {
+      "compose@" = {
+        description = "%i application from a compose file";
+        partOf = [ runtimeService ];
+        after = [ runtimeService runtimeSocket ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          WorkingDirectory = "/etc/compose/%i";
+          ExecStart = "${composeExecutable} up -d";
+          ExecStop = "${composeExecutable} down";
         };
       };
-
-      composeServices = lib.concatMapAttrs (name: app: {
-        "compose-application@${name}" = {
-          overrideStrategy = "asDropin";
-          wantedBy = [ "default.target" ];
-          after = app.after;
-          requires = app.requires;
-        };
-      }) enabledApplications;
-    in composeServices // serviceTemplates;
-
-    systemd.paths = let
-      pathTemplates = {
-        "compose-watcher@" = {
-          description = "Monitor compose file for %i service for changes";
-          pathConfig = {
-            PathChanged = "/etc/compose/%i/compose.yaml";
-          };
-        };
+    } // (lib.concatMapAttrs (name: app: {
+      "compose@${name}" = {
+        overrideStrategy = "asDropin";
+        wantedBy = [ "default.target" ];
+        after = app.after;
+        requires = app.requires;
+        restartTriggers = [ "${app.composeFile}" ];
       };
-
-      composePaths = lib.concatMapAttrs (name: app: {
-        "compose-watcher@${name}" = {
-          overrideStrategy = "asDropin";
-          wantedBy = [ "default.target" ];
-        };
-      }) enabledApplications;
-    in composePaths // pathTemplates;
+    }) enabledApplications);
 
     environment.etc = lib.concatMapAttrs (name: app: {
       "compose-file-${name}" = {
