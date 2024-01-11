@@ -30,8 +30,8 @@ services:
     ports:
       - 9000:9000
     networks:
-      - swag_default
       - default
+      - reverse_proxy
     restart: unless-stopped
   postgres:
     container_name: postgres
@@ -46,5 +46,5 @@ services:
       - default
 networks:
   default:
-  swag_default:
-    external: true
+  reverse_proxy:
+    name: reverse_proxy

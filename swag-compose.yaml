@@ -18,4 +18,9 @@ services:
     ports:
       - 443:443
       - 80:80
+    networks:
+      - reverse_proxy
     restart: unless-stopped
+networks:
+  reverse_proxy:
+    name: reverse_proxy

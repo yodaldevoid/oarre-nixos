@@ -124,18 +124,8 @@
   compose.applications = {
     ddclient.composeFile = ./ddclient-compose.yaml;
     swag.composeFile = ./swag-compose.yaml;
-    mealie = {
-      composeFile = ./mealie-compose.yaml;
-      # TODO: provide less "magic" way to define these
-      requires = [ "compose-application@swag.service" ];
-      after = [ "compose-application@swag.service" ];
-    };
-    jellyfin = {
-      composeFile = ./jellyfin-compose.yaml;
-      # TODO: provide less "magic" way to define these
-      requires = [ "compose-application@swag.service" ];
-      after = [ "compose-application@swag.service" ];
-    };
+    mealie.composeFile = ./mealie-compose.yaml;
+    jellyfin.composeFile = ./jellyfin-compose.yaml;
   };
   # TODO: automatically create links from config to log and cache for jellyfin
 
