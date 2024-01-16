@@ -112,6 +112,7 @@
       max log size = 50
       printcap name = /dev/null
       load printers = no
+      use sendfile = yes
     '';
     shares = {
       media = {
