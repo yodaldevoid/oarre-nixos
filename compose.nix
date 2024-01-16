@@ -56,11 +56,12 @@ in {
         partOf = [ runtimeService ];
         after = [ runtimeService runtimeSocket ];
         serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
+          Type = "exec";
           WorkingDirectory = "/etc/compose/%i";
-          ExecStart = "${composeExecutable} up -d";
-          ExecStop = "${composeExecutable} down";
+          # TODO: Disable docker logging as systemd will capture STDIN/STDERR
+          ExecStart = "${composeExecutable} up";
+          # TODO: support optionally just reloading the compose file
+          ExecStopPost = "${composeExecutable} down";
         };
       };
     } // (lib.concatMapAttrs (name: app: {
