@@ -93,7 +93,7 @@
     '';
     shares = {
       media = {
-        path = "/data";
+        path = "/data/media";
         browseable = "yes";
         "read only" = "no";
         "guest ok" = "yes";

@@ -14,8 +14,7 @@ services:
       - /var/lib/jellyfin:/config
       - /var/log/jellyfin:/var/log/jellyfin
       - /var/cache/jellyfin:/cache
-      - /data/tvshows:/data/tvshows
-      - /data/movies:/data/movies
+      - /data/media:/data
     ports:
       - 8096:8096 # HTTP web UI
       - 8920:8920 # HTTPS web UI
