@@ -1,0 +1,108 @@
+services:
+  # TODO: add Tdarr home.tdarr.io
+  wireguard:
+    image: qmcgaw/gluetun
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+    ports:
+      # QBT UI Port
+      - 8090:8090
+      # Bittorrent port
+      - 6881:6881
+      - 6881:6881/udp
+      # Sonarr port
+      - 8989:8989
+      # Radarr port
+      - 7878:7878
+      # Prowlarr port
+      - 9696:9696
+      # FlareSolverr
+      - 8191:8191
+    environment:
+      - TZ=America/New_York
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    volumes:
+      - /run/secrets/protonvpn-wireguard.conf:/gluetun/wireguard/wg0.conf
+    networks:
+      - reverse_proxy
+    restart: unless-stopped
+  qbittorrent:
+    image: ghcr.io/linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - WEBUI_PORT=8090
+      - PUID=2500
+      - PGID=2000
+      - UMASK=002
+    volumes:
+      - /var/lib/arr/qbittorrent:/config
+      - /var/log/arr/qbittorrent:/log
+      - /data/torrents:/data/torrents
+    network_mode: service:wireguard
+    depends_on:
+      wireguard:
+        condition: service_healthy
+    restart: unless-stopped
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=America/New_York
+    restart: unless-stopped
+    network_mode: service:wireguard
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=2501
+      - PGID=2000
+      - UMASK=002
+      - TZ=America/New_York
+    volumes:
+      - /var/lib/arr/prowlarr:/config
+      - /data:/data
+    restart: unless-stopped
+    network_mode: service:wireguard
+    depends_on:
+      - wireguard
+      - qbittorrent
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=2502
+      - PGID=2000
+      - TZ=America/New_York
+    volumes:
+      - /var/lib/arr/sonarr:/config
+      - /data:/data
+    restart: unless-stopped
+    network_mode: service:wireguard
+    depends_on:
+      - prowlarr
+      - qbittorrent
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=2503
+      - PGID=2000
+      - TZ=America/New_York
+    volumes:
+      - /var/lib/arr/radarr:/config
+      - /data:/data
+    restart: unless-stopped
+    network_mode: service:wireguard
+    depends_on:
+      - prowlarr
+      - qbittorrent
+networks:
+  reverse_proxy:
+    name: reverse_proxy
