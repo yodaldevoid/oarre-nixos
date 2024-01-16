@@ -43,6 +43,10 @@
 
     samba = { isNormalUser = true; group = "media"; uid = 2000; };
     jellyfin = { isSystemUser = true; group = "media"; uid = 2400; };
+    qbittorrent = { isSystemUser = true; group = "media"; uid = 2500; };
+    prowlarr = { isSystemUser = true; group = "media"; uid = 2501; };
+    sonarr = { isSystemUser = true; group = "media"; uid = 2502; };
+    radarr = { isSystemUser = true; group = "media"; uid = 2503; };
   };
   users.groups = {
     media.gid = 2000;
@@ -54,6 +58,7 @@
   sops.secrets."restic-b2-${config.networking.hostName}_repo" = {};
   sops.secrets."restic-b2-${config.networking.hostName}_pass" = {};
   sops.secrets."restic-b2-${config.networking.hostName}.env" = {};
+  sops.secrets."protonvpn-wireguard.conf" = {};
 
   networking.hostName = "oarre";
   networking.hostId = "441b4f6d";
@@ -146,6 +151,7 @@
     swag.composeFile = ./swag-compose.yaml;
     mealie.composeFile = ./mealie-compose.yaml;
     jellyfin.composeFile = ./jellyfin-compose.yaml;
+    arr.composeFile = ./arr-compose.yaml;
   };
 
   services.restic.backups = let
@@ -164,6 +170,7 @@
         "/var/lib/swag"
         "/var/lib/mealie"
         "/var/lib/jellyfin"
+        "/var/lib/arr"
         "/data/media"
       ];
       extraBackupArgs = [ "--tag data" ];
