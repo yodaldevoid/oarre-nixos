@@ -13,8 +13,9 @@ services:
     environment:
     # Set Backend ENV Variables Here
       - ALLOW_SIGNUP=true
-      - PUID=1000
-      - PGID=100
+      - PUID=2300
+      - PGID=2001
+      - UMASK=002
       - TZ=America/New_York
       - MAX_WORKERS=1
       - WEB_CONCURRENCY=1
