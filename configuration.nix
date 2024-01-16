@@ -37,6 +37,8 @@
       openssh.authorizedKeys.keyFiles = [ ./monamo_ed25519.pub ./katrin_ed25519.pub ];
     };
 
+    nutmonitor = { isSystemUser = true; group = "nutmonitor"; };
+
     ddclient = { isSystemUser = true; group = "containers"; uid = 2100; };
     swag = { isSystemUser = true; group = "containers"; uid = 2200; };
     mealie = { isSystemUser = true; group = "containers"; uid = 2300; };
@@ -49,6 +51,8 @@
     radarr = { isSystemUser = true; group = "media"; uid = 2503; };
   };
   users.groups = {
+    nutmonitor = {};
+
     media.gid = 2000;
     containers.gid = 2001;
   };
@@ -206,6 +210,25 @@
   systemd.services."restic-backups-data".serviceConfig = { PrivateTmp = lib.mkForce false; };
   # TODO: backup /var/log
   # TODO: run "b2 cancel-all-unfinished-large-files <bucketName>"
+
+  # TODO: use user nutdaemon for upsd when supported
+  # TODO: use user nutmonitor for upsmon when supported. Until then set using RUN_AS_USER in upsmon.conf.
+  power.ups = {
+    enable = true;
+    maxStartDelay = 10;
+    ups.main = {
+      description = "APC Back-UPS ES 600M1";
+      driver = "usbhid-ups";
+      port = "auto";
+    };
+  };
+  sops.secrets."upsd.conf".path = "/etc/nut/upsd.conf";
+  sops.secrets."upsd.users".path = "/etc/nut/upsd.users";
+  sops.secrets."upsmon.conf" = {
+    path = "/etc/nut/upsmon.conf";
+    owner = config.users.users.nutmonitor.name;
+    group = config.users.users.nutmonitor.group;
+  };
 
   # TODO: get systemd-boot working with ZFS
   boot.loader.efi.canTouchEfiVariables = true;
