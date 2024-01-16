@@ -45,7 +45,10 @@ in {
 
     enabledApplications = filterAttrs (name: app: app.enable) cfg.applications;
   in (mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.docker-compose ];
+    environment.systemPackages = [
+      pkgs.docker
+      pkgs.docker-compose
+    ];
   
     systemd.services = {
       "compose@" = {
