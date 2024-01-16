@@ -11,10 +11,7 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
-    sops
     tailscale
-    docker-client
-    docker-compose
   ];
   environment.enableAllTerminfo = true;
 
@@ -30,6 +27,11 @@
         "media"
       ];
       packages = with pkgs; [
+        docker-client
+        docker-compose
+        file
+        htop
+        tmux
         tree
       ];
       openssh.authorizedKeys.keyFiles = [ ./monamo_ed25519.pub ./katrin_ed25519.pub ];
