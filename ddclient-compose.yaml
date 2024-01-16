@@ -3,8 +3,8 @@ services:
     image: lscr.io/linuxserver/ddclient:latest
     container_name: ddclient
     environment:
-      - PUID=1000
-      - PGID=100
+      - PUID=2100
+      - PGID=2001
       - TZ=America/New_York
     volumes:
       - /var/lib/ddclient:/config

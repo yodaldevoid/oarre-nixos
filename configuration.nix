@@ -18,18 +18,33 @@
   ];
   environment.enableAllTerminfo = true;
 
-  users.groups.samba = {};
-  users.users.yodal = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "docker" "podman" "samba" ];
-    packages = with pkgs; [
-      tree
-    ];
-    openssh.authorizedKeys.keyFiles = [ ./monamo_ed25519.pub ./katrin_ed25519.pub ];
+  users.users = {
+    yodal = {
+      isNormalUser = true;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "docker"
+        "podman"
+        "containers"
+        "media"
+      ];
+      packages = with pkgs; [
+        tree
+      ];
+      openssh.authorizedKeys.keyFiles = [ ./monamo_ed25519.pub ./katrin_ed25519.pub ];
+    };
+
+    ddclient = { isSystemUser = true; group = "containers"; uid = 2100; };
+    swag = { isSystemUser = true; group = "containers"; uid = 2200; };
+    mealie = { isSystemUser = true; group = "containers"; uid = 2300; };
+
+    samba = { isNormalUser = true; group = "media"; uid = 2000; };
+    jellyfin = { isSystemUser = true; group = "media"; uid = 2400; };
   };
-  users.users.samba = {
-    isNormalUser = true;
-    group = "samba";
+  users.groups = {
+    media.gid = 2000;
+    containers.gid = 2001;
   };
 
   sops.defaultSopsFile = ./secrets.yaml;
@@ -100,7 +115,7 @@
         "create mask" = "0664";
         "directory mask" = "0775";
         "force user" = "samba";
-        "force group" = "samba";
+        "force group" = "media";
       };
     };
   };

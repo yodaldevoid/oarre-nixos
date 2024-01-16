@@ -5,8 +5,9 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - PUID=1000
-      - PGID=100
+      - PUID=2200
+      - PGID=2001
+      - UMASK=002
       - TZ=America/New_York
       - URL=thevoidbetween.us
       - SUBDOMAINS=wildcard
