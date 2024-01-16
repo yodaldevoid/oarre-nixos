@@ -147,7 +147,6 @@
     mealie.composeFile = ./mealie-compose.yaml;
     jellyfin.composeFile = ./jellyfin-compose.yaml;
   };
-  # TODO: automatically create links from config to log and cache for jellyfin
 
   services.restic.backups = let
     zfsCmd = "${pkgs.zfs}/bin/zfs";
