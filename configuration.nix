@@ -198,6 +198,7 @@
         ${mountCmd} -m -t zfs rpool/nixos/var/lib@restic-backup /backup/var/lib
       '';
       backupCleanupCommand = ''
+        ${umountCmd} /backup/data /backup/var/lib
         ${zfsCmd} destroy -r rpool@restic-backup
         rm -r /backup
       '';
