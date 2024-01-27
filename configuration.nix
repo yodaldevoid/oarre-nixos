@@ -79,7 +79,6 @@
   networking.firewall = {
     enable = true;
     trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
     allowedTCPPorts = [ 22 ];
   };
 
@@ -98,7 +97,11 @@
     settings.PasswordAuthentication = false;
     settings.X11Forwarding = true;
   };
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+    useRoutingFeatures = "server";
+  };
 
   services.samba-wsdd = {
     enable = true;
