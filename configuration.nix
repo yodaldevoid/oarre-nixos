@@ -221,8 +221,8 @@
     enable = true;
     maxStartDelay = 10;
     ups.main = {
-      description = "APC Back-UPS ES 600M1";
-      driver = "usbhid-ups";
+      description = "Tripp Lite SMART1500RM2U";
+      driver = "tripplite_usb";
       port = "auto";
     };
   };
