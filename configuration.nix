@@ -12,6 +12,7 @@
     vim
     wget
     tailscale
+    lm_sensors
   ];
   environment.enableAllTerminfo = true;
 
@@ -232,6 +233,69 @@
     path = "/etc/nut/upsmon.conf";
     owner = config.users.users.nutmonitor.name;
     group = config.users.users.nutmonitor.group;
+  };
+
+  services.prometheus = {
+    enable = true;
+    # TODO: alertmanager
+    exporters = {
+      node = {
+        enable = true;
+        disabledCollectors = ["zfs"];
+      };
+      nut.enable = true;
+      smartctl = {
+        enable = true;
+        user = "root";
+        group = "root";
+      };
+      zfs = {
+        enable = true;
+        extraFlags = ["--exclude='@restic-backup'"];
+      };
+    };
+    scrapeConfigs = [
+      # TODO: exportarr for sonarr, radarr, prowlarr
+      # TODO: mealie postgress
+      # TODO: arr wireguard
+      # TODO: jellyfin
+      # TODO: systemd?
+      # TODO: pihole?
+      # TODO: docker
+      # TODO: nginx
+      {
+        job_name = "node";
+        static_configs = [{
+          targets = ["127.0.0.1:${toString config.services.prometheus.exporters.node.port}"];
+        }];
+      }
+      {
+        job_name = "ups-main";
+        metrics_path = "/ups_metrics";
+        params = {
+          ups = ["main"];
+          variables = ["battery.charge,battery.voltage,battery.voltage.nominal,input.frequency.nominal,input.voltage,input.voltage.nominal,ups.load,ups.status,ups.temperature"];
+        };
+        static_configs = [{
+          targets = ["127.0.0.1:${toString config.services.prometheus.exporters.nut.port}"];
+          labels = {
+            ups = "main";
+          };
+        }];
+      }
+      {
+        job_name = "smartctl";
+        static_configs = [{
+          targets = ["127.0.0.1:${toString config.services.prometheus.exporters.smartctl.port}"];
+        }];
+      }
+      {
+        job_name = "zfs";
+        static_configs = [{
+          targets = ["127.0.0.1:${toString config.services.prometheus.exporters.zfs.port}"];
+        }];
+      }
+    ];
   };
 
   # TODO: get systemd-boot working with ZFS
