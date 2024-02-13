@@ -45,9 +45,6 @@ services:
       - /var/log/arr/qbittorrent:/log
       - /data/torrents:/data/torrents
     network_mode: service:wireguard
-    depends_on:
-      wireguard:
-        condition: service_healthy
     restart: unless-stopped
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -72,9 +69,6 @@ services:
       - /data:/data
     restart: unless-stopped
     network_mode: service:wireguard
-    depends_on:
-      - wireguard
-      - qbittorrent
   sonarr:
     image: linuxserver/sonarr:latest
     container_name: sonarr
@@ -87,9 +81,6 @@ services:
       - /data:/data
     restart: unless-stopped
     network_mode: service:wireguard
-    depends_on:
-      - prowlarr
-      - qbittorrent
   radarr:
     image: linuxserver/radarr:latest
     container_name: radarr
@@ -102,9 +93,6 @@ services:
       - /data:/data
     restart: unless-stopped
     network_mode: service:wireguard
-    depends_on:
-      - prowlarr
-      - qbittorrent
 networks:
   reverse_proxy:
     name: reverse_proxy
