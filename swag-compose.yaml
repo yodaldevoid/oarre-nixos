@@ -21,6 +21,8 @@ services:
       - 80:80
     networks:
       - reverse_proxy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 networks:
   reverse_proxy:

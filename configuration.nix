@@ -81,6 +81,10 @@
     enable = true;
     trustedInterfaces = [ "tailscale0" ];
     allowedTCPPorts = [ 22 ];
+    # Allow any of the docker-compose bridge networks access to Prometheus.
+    # This is really just for Nginx to have acess, but there's not a good way
+    # to specify the name of the bridge network's interface on the host side.
+    interfaces."br-+".allowedTCPPorts = [ 9090 ];
   };
 
   time.timeZone = "America/New_York";
