@@ -310,6 +310,7 @@
         }];
       }
     ];
+    ruleFiles = [ ./prometheus/rules/zfs_alerts.yml ];
   };
 
   # TODO: get systemd-boot working with ZFS
