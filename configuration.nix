@@ -167,6 +167,7 @@
     zfsCmd = "${pkgs.zfs}/bin/zfs";
     mountCmd = "${pkgs.mount}/bin/mount";
     umountCmd = "${pkgs.umount}/bin/umount";
+    curlCmd = "${pkgs.curl}/bin/curl -fsS -o /dev/null -m 10 --retry 5";
   in {
     data = {
       repositoryFile = config.sops.secrets."restic-b2-${config.networking.hostName}_repo".path;
@@ -193,17 +194,26 @@
       # TODO: calculate pools to snapshot from paths to backup
       backupPrepareCommand = ''
         set -e
+        ${curlCmd} $HEALTHCHECK_URL/start
         # Destroy any lingering backup snapshot.
         ${umountCmd} /backup/data /backup/var/lib || true
-        ${zfsCmd} list -t snapshot | grep -q "@restic-backup" && ${zfsCmd} destroy -r rpool@restic-backup
+        ${zfsCmd} list -t snapshot | grep -q "rpool.*@restic-backup" && ${zfsCmd} destroy -r rpool@restic-backup
+        ${zfsCmd} list -t snapshot | grep -q "data.*@restic-backup" && ${zfsCmd} destroy -r data@restic-backup
         rm -rf /backup
         ${zfsCmd} snapshot -r rpool@restic-backup
-        ${mountCmd} -m -t zfs rpool/data@restic-backup /backup/data
+        ${zfsCmd} snapshot -r data@restic-backup
         ${mountCmd} -m -t zfs rpool/nixos/var/lib@restic-backup /backup/var/lib
+        ${mountCmd} -m -t zfs data@restic-backup /backup/data
       '';
       backupCleanupCommand = ''
+        if [ "$SERVICE_RESULT" == "success" ]; then
+          ${curlCmd} $HEALTHCHECK_URL
+        else
+          ${curlCmd} $HEALTHCHECK_URL/fail
+        fi
         ${umountCmd} /backup/data /backup/var/lib
         ${zfsCmd} destroy -r rpool@restic-backup
+        ${zfsCmd} destroy -r data@restic-backup
         rm -r /backup
       '';
       timerConfig = {
