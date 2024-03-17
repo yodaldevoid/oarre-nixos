@@ -160,11 +160,11 @@
 
   compose.enable = true;
   compose.applications = {
-    ddclient.composeFile = ./ddclient-compose.yaml;
-    swag.composeFile = ./swag-compose.yaml;
-    mealie.composeFile = ./mealie-compose.yaml;
-    jellyfin.composeFile = ./jellyfin-compose.yaml;
-    arr.composeFile = ./arr-compose.yaml;
+    ddclient.composeFile = ./compose/ddclient.yaml;
+    swag.composeFile = ./compose/swag.yaml;
+    mealie.composeFile = ./compose/mealie.yaml;
+    jellyfin.composeFile = ./compose/jellyfin.yaml;
+    arr.composeFile = ./compose/arr.yaml;
   };
 
   services.restic.backups = let
