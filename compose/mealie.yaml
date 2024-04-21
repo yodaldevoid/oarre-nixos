@@ -1,6 +1,6 @@
 services:
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC2
+    image: ghcr.io/mealie-recipes/mealie:latest
     container_name: mealie
     deploy:
       resources:
@@ -10,6 +10,7 @@ services:
       - postgres
     volumes:
       - /var/lib/mealie/appdata:/app/data/
+      - /var/log/mealie/:/var/log/mealie/
     environment:
     # Set Backend ENV Variables Here
       - ALLOW_SIGNUP=true
@@ -20,6 +21,7 @@ services:
       - MAX_WORKERS=1
       - WEB_CONCURRENCY=1
       - BASE_URL=https://recipes.thevoidbetween.us
+      - LOG_CONFIG_OVERRIDE=/app/data/logconf.json
 
     # Database Settings
       - DB_ENGINE=postgres
