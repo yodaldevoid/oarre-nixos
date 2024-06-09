@@ -59,11 +59,6 @@
   };
 
   sops.defaultSopsFile = ./secrets.yaml;
-  sops.secrets."wireless.env" = {};
-  sops.secrets."restic-b2-${config.networking.hostName}_repo" = {};
-  sops.secrets."restic-b2-${config.networking.hostName}_pass" = {};
-  sops.secrets."restic-b2-${config.networking.hostName}.env" = {};
-  sops.secrets."protonvpn-wireguard.conf" = {};
 
   networking.hostName = "oarre";
   networking.hostId = "441b4f6d";
@@ -74,6 +69,7 @@
         psk = "@HOME_PSK@";
     };
   };
+  sops.secrets."wireless.env" = {};
 
   services.resolved.enable = true;
 
@@ -166,6 +162,7 @@
     jellyfin.composeFile = ./compose/jellyfin.yaml;
     arr.composeFile = ./compose/arr.yaml;
   };
+  sops.secrets."protonvpn-wireguard.conf" = {};
 
   services.restic.backups = let
     zfsCmd = "${pkgs.zfs}/bin/zfs";
@@ -227,6 +224,9 @@
     };
   };
   systemd.services."restic-backups-data".serviceConfig = { PrivateTmp = lib.mkForce false; };
+  sops.secrets."restic-b2-${config.networking.hostName}_repo" = {};
+  sops.secrets."restic-b2-${config.networking.hostName}_pass" = {};
+  sops.secrets."restic-b2-${config.networking.hostName}.env" = {};
   # TODO: backup /var/log
   # TODO: run "b2 cancel-all-unfinished-large-files <bucketName>"
 
