@@ -1,6 +1,6 @@
 services:
   jellyfin:
-    image: jellyfin/jellyfin
+    image: ghcr.io/jellyfin/jellyfin
     container_name: jellyfin
     user: 2400:2000
     group_add:
