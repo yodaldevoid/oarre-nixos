@@ -90,7 +90,7 @@
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
-    pinentryFlavor = "curses";
+    pinentryPackage = pkgs.pinentry-curses;
   };
 
   services.openssh = {
@@ -240,14 +240,33 @@
       driver = "tripplite_usb";
       port = "auto";
     };
+    users = {
+      admin = {
+        passwordFile = config.sops.secrets.upsd_admin_pass.path;
+        actions = ["set" "fsd"];
+        instcmds = ["all"];
+      };
+      upswired = {
+        passwordFile = config.sops.secrets.upsd_upswired_pass.path;
+        upsmon = "primary";
+      };
+    };
+    upsmon = {
+      enable = true;
+      monitor."main@localhost" =  {
+        user = "upswired";
+        type = "primary";
+        passwordFile = config.sops.secrets.upsd_upswired_pass.path;
+      };
+      settings = {
+        # Remove mkForce once https://github.com/NixOS/nixpkgs/issues/318582 is closed
+        RUN_AS_USER = lib.mkForce config.users.users.nutmonitor.name;
+        SHUTDOWNCMD = "systemctl poweroff --message \"UPS no longer able to power system\"";
+      };
+    };
   };
-  sops.secrets."upsd.conf".path = "/etc/nut/upsd.conf";
-  sops.secrets."upsd.users".path = "/etc/nut/upsd.users";
-  sops.secrets."upsmon.conf" = {
-    path = "/etc/nut/upsmon.conf";
-    owner = config.users.users.nutmonitor.name;
-    group = config.users.users.nutmonitor.group;
-  };
+  sops.secrets.upsd_admin_pass = {};
+  sops.secrets.upsd_upswired_pass = {};
 
   services.prometheus = {
     enable = true;
